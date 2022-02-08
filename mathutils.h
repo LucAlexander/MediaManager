@@ -25,17 +25,23 @@ typedef struct v4{
 	float h;
 }v4;
 
-float lenDirX(float len, int32_t dir);
+float lenDirX(float len, float dir);
 
-float lenDirY(float len, int32_t dir);
+float lenDirY(float len, float dir);
 
-int32_t sign(int32_t val);
+int8_t sign(float val);
 
-float distancePoint(v2, v2);
+float distancePoint(float x, float y, float xx, float yy);
+float distancePointV2(v2, v2);
 
-uint32_t pointInRect(v2, v4);
+float directionPoint(float x, float y, float xx, float yy);
+float directionPointV2(v2, v2);
 
-uint32_t pointInRectB(v2, v4);
+uint8_t pointInRect(float x, float y, v4);
+uint8_t pointInRectV2(v2, v4);
+
+uint8_t pointInRectB(float x, float y, v4);
+uint8_t pointInRectV2B(v2, v4);
 
 void approachZero(int32_t* val, int32_t amount);
 void approachZeroF(float* val, float amount);

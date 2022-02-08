@@ -2,27 +2,40 @@
 #include <stdlib.h>
 #include "mathutils.h"
 
-float lenDirX(float len, int32_t dir){
-	return len * cos(dir*PI/100.0);
+float lenDirX(float len, float dir){
+	return len * cos(dir*PI/180.0);
 }
 
-float lenDirY(float len, int32_t dir){
-	return len * -sin(dir*PI/100.0);
+float lenDirY(float len, float dir){
+	return len * -sin(dir*PI/180.0);
 }
 
-int32_t sign(int32_t val){
+int8_t sign(float val){
 	return val == 0 ? 0 : val > 0 ? 1 : -1;
 }
 
-float distancePoint(v2 a, v2 b){
-	a.x-=b.x;
-	a.y-=b.y;;
-	a.x *= a.x;
-	a.y *= a.y;
-	return sqrt(a.x+a.y);
+float distancePoint(float x, float y, float xx, float yy){
+	x -= xx;
+	y -= yy;
+	x *= x;
+	y *= y;
+	return sqrt(x+y);
 }
 
-uint32_t pointInRect(v2 p, v4 r){
+float distancePointV2(v2 a, v2 b){
+	return distancePoint(a.x, a.y, b.x, b.y);
+}
+
+float directionPoint(float x, float y, float xx, float yy){
+	float res = (atan2(yy-y, xx-x)*180)/PI;
+	return (yy > y) ? (360-res) : res;
+}
+
+float directionPointV2(v2 a, v2 b){
+	return directionPoint(a.x, a.y, b.x, b.y);
+}
+
+uint8_t pointInRect(float x, float y, v4 r){
 	if (r.w < 0){
 		r.w *= -1;
 		r.x -= r.w;
@@ -31,12 +44,15 @@ uint32_t pointInRect(v2 p, v4 r){
 		r.h *= -1;
 		r.y -= r.w;
 	}
-	return (p.x >= r.x && p.x <= r.x+r.w) && 
-		(p.y >= r.y && p.y <= r.y+r.h);
-
+	return (x >= r.x && x <= r.x+r.w) && 
+		(y >= r.y && y <= r.y+r.h);
 }
 
-uint32_t pointInRectB(v2 p, v4 r){
+uint8_t pointInRectV2(v2 a, v4 b){
+	return pointInRect(a.x, a.y, b);
+}
+
+uint8_t pointInRectB(float x, float y, v4 r){
 	if (r.x > r.w){
 		float temp = r.x;
 		r.x = r.w;
@@ -47,8 +63,12 @@ uint32_t pointInRectB(v2 p, v4 r){
 		r.y = r.h;
 		r.h = temp;
 	}
-	return (p.x >= r.x && p.x <= r.w) && 
-		(p.y >= r.y && p.y <= r.h);
+	return (x >= r.x && x <= r.w) && 
+		(y >= r.y && y <= r.h);
+}
+
+uint8_t pointInRectV2B(v2 a, v4 b){
+	return pointInRectB(a.x, a.y, b);
 }
 
 void approachZero(int32_t* val, int32_t amount){
