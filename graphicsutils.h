@@ -30,8 +30,8 @@ typedef struct font{
 	uint8_t g;
 	uint8_t b;
 	uint8_t a;
-	uint32_t kerning;
-	uint32_t leading;
+	uint16_t kerning;
+	uint16_t leading;
 	float ptSize;
 	float scale;
 	SDL_Texture* glyphMap[128];
@@ -51,13 +51,13 @@ typedef struct GraphicsHandler{
 	SDL_Renderer* renderer;
 	view renderView;
 	fontHandler fonts;
-	uint32_t windowW;
-	uint32_t windowH;
+	uint16_t windowW;
+	uint16_t windowH;
 	float spriteScaleX;
 	float spriteScaleY;
 }GraphicsHandler;
 
-void graphicsInit(uint32_t width, uint32_t height, const char* windowTitle);
+void graphicsInit(uint16_t width, uint16_t height, const char* windowTitle);
 void graphicsClose();
 
 void handlerRenderViewInit();

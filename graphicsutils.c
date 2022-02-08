@@ -4,15 +4,13 @@
 #include "sdlfileutils.h"
 #include <string.h>
 
-//TODO put ghandle everywhere
-
 #include <stdio.h>
 
 HASHMAP_SOURCE(FontMap, const char*, font, hashS)
 
 static GraphicsHandler ghandle;
 
-void graphicsInit(uint32_t width, uint32_t height, const char* windowTitle){
+void graphicsInit(uint16_t width, uint16_t height, const char* windowTitle){
 	ghandle.window = NULL;
 	ghandle.renderer = NULL;
 	handlerRenderViewInit();
@@ -20,7 +18,7 @@ void graphicsInit(uint32_t width, uint32_t height, const char* windowTitle){
 	ghandle.windowH = 1080;
 	ghandle.spriteScaleX = 1;
 	ghandle.spriteScaleY = 1;
-	SDL_Init(SDL_INIT_VIDEO);
+	SDL_Init(SDL_INIT_EVERYTHING);
 	TTF_Init();
 	if (ghandle.window != NULL){
 		SDL_DestroyWindow(ghandle.window);
@@ -44,6 +42,9 @@ void graphicsClose(){
 	TTF_Quit();
 	SDL_DestroyWindow(ghandle.window);
 	SDL_DestroyRenderer(ghandle.renderer);
+	ghandle.window = NULL;
+	ghandle.renderer = NULL;
+	SDL_QuitSubSystem(SDL_INIT_EVERYTHING);
 	SDL_Quit();
 }
 
