@@ -149,6 +149,49 @@ void formatDestFRectToView(SDL_FRect* destRect){
 	destRect->y-=ghandle.renderView.y;
 }
 
+void BlitableInitF(Blitable* blit, const char* source, uint32_t w, uint32_t h){
+	BlitableInit(blit, getTexture(source), w, h);
+}
+
+void BlitableInit(Blitable* blit, SDL_Texture* t, uint32_t w, uint32_t h){
+	blit->texture = t;
+	SDL_Rect bound = {0, 0, w, h};
+	blit->drawBound = bound;
+	blit->displayW = w;
+	blit->displayH = h;
+	SDL_QueryTexture(t, NULL, NULL, &(blit->textureW), &(blit->textureH));
+	blit->flags = BLITABLE_VISIBLE;
+	blit->angle = 0;
+	SDL_FPoint mid = {w/2, h/2};
+	blit->center = mid;
+}
+
+void renderBlitable(Blitable* blit, float x, float y){
+	if (!(blit->flags & BLITABLE_VISIBLE)){
+		return;
+	}
+	SDL_RendererFlip flipArg = SDL_FLIP_NONE;
+	if (blit->flags & BLITABLE_FLIP_H){
+		flipArg |= SDL_FLIP_HORIZONTAL;
+		flipArg &= ~(SDL_FLIP_NONE);
+	}
+	if (blit->flags & BLITABLE_FLIP_V){
+		flipArg |= SDL_FLIP_VERTICAL;
+		flipArg &= ~(SDL_FLIP_NONE);
+	}
+	SDL_FRect dest = {x-blit->center.x, y-blit->center.y, blit->displayW, blit->displayH};
+	blitSurfaceEXF(blit->texture, &(blit->drawBound), dest, blit->angle, &(blit->center), flipArg);
+}
+
+void renderBlitableV2(Blitable* blit, v2 pos){
+	renderBlitable(blit, pos.x, pos.y);
+}
+
+void BlitableFree(Blitable* blit){
+	SDL_DestroyTexture(blit->texture);
+	blit->texture = NULL;
+}
+
 void blitSurface(SDL_Texture* texture, SDL_Rect* srcRect, SDL_Rect destRect){
 	formatDestRectToView(&destRect);
 	SDL_RenderCopy(ghandle.renderer, texture, srcRect, &destRect);
