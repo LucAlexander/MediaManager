@@ -11,6 +11,7 @@ HASHMAP_SOURCE(FontMap, const char*, font, hashS)
 static GraphicsHandler ghandle;
 
 void graphicsInit(uint16_t width, uint16_t height, const char* windowTitle){
+	ghandle.renderScale = RENDER_SCALE_NEAREST;
 	ghandle.window = NULL;
 	ghandle.renderer = NULL;
 	handlerRenderViewInit();
@@ -86,6 +87,10 @@ void renderSetView(view v){
 	SDL_RenderSetLogicalSize(ghandle.renderer, v.pw, v.ph);
 }
 
+void renderSetScaleQuality(RENDER_SCALE_QUALITY hint){
+	ghandle.renderScale = hint;
+}
+
 void toggleFullscreen(){
 	uint32_t flags = (SDL_GetWindowFlags(ghandle.window) ^ SDL_WINDOW_FULLSCREEN_DESKTOP);
 	if (SDL_SetWindowFullscreen(ghandle.window, flags) < 0){
@@ -94,12 +99,7 @@ void toggleFullscreen(){
 	}
 	renderSetView(ghandle.renderView);
 	if ((flags & SDL_WINDOW_FULLSCREEN_DESKTOP) != 0){
-		/*
-		LINEAR WILL INTERPOLATE COLORS BETWEEN PIXELS
-		0 IS STANDARD FOR PIXEL ART
-		*/
-		//SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
-		//SDL_SetHint (SDL_HINT_RENDER_SCALE_QUALITY, 0);
+		SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, (const char*)ghandle.renderScale);
 	}
 }
 

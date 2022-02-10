@@ -46,6 +46,14 @@ typedef struct fontHandler{
 	FontMap list;
 }fontHandler;
 
+typedef enum RENDER_SCALE_QUALITY{
+	RENDER_SCALE_NEAREST=0,
+	RENDER_SCALE_LINEAR=1,
+	RENDER_SCALE_ANISOTROPIC=2
+}RENDER_SCALE_QUALITY;
+
+void renderSetScaleQuality(RENDER_SCALE_QUALITY hint);
+
 typedef struct GraphicsHandler{
 	SDL_Window* window;
 	SDL_Renderer* renderer;
@@ -55,6 +63,7 @@ typedef struct GraphicsHandler{
 	uint16_t windowH;
 	float spriteScaleX;
 	float spriteScaleY;
+	RENDER_SCALE_QUALITY renderScale;
 }GraphicsHandler;
 
 void graphicsInit(uint16_t width, uint16_t height, const char* windowTitle);
@@ -90,11 +99,11 @@ void renderSetColor(uint8_t r, uint8_t g, uint8_t b, uint8_t a);
 void formatDestRectToView(SDL_Rect* destRect);
 void formatDestFRectToView(SDL_FRect* destRect);
 
-enum BLITABLE_FLAGS{
+typedef enum BLITABLE_FLAGS{
 	BLITABLE_VISIBLE=1,
 	BLITABLE_FLIP_H=2,
 	BLITABLE_FLIP_V=4
-};
+}BLITABLE_FLAGS;
 
 typedef struct Blitable{
 	SDL_Texture* texture;
@@ -103,7 +112,7 @@ typedef struct Blitable{
 	uint32_t displayH;
 	int32_t textureW;
 	int32_t textureH;
-	uint8_t flags;
+	BLITABLE_FLAGS flags;
 	double angle;
 	SDL_FPoint center;
 }Blitable;
