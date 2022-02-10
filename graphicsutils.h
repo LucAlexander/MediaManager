@@ -77,6 +77,11 @@ struct v2 worldToViewV2(struct v2 coords);
 struct v2 viewToWorld(float x, float y);
 struct v2 worldToView(float x, float y);
 
+void viewToWorldV2Ptr(struct v2* coords);
+void worldToViewV2Ptr(struct v2* coords);
+void viewToWorldPtr(float* x, float* y);
+void worldToViewPtr(float* x, float* y);
+
 void renderFlip();
 void renderClear();
 

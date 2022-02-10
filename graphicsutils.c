@@ -28,7 +28,7 @@ void graphicsInit(uint16_t width, uint16_t height, const char* windowTitle){
 	}
 	SDL_CreateWindowAndRenderer(width, height, SDL_WINDOW_OPENGL, &(ghandle.window), &(ghandle.renderer));
 	SDL_SetWindowTitle(ghandle.window, windowTitle);
-	view defaultView = {0, 0, width, height};
+	view defaultView = {0, 0, 0, 0, width, height};
 	ghandle.windowW = width;
 	ghandle.windowH = height;
 	renderSetView(defaultView);
@@ -83,6 +83,7 @@ void renderSetView(view v){
 	ghandle.renderView = v;
 	const SDL_Rect port = {v.px, v.py, v.pw, v.ph};
 	SDL_RenderSetViewport(ghandle.renderer, &port);
+	SDL_RenderSetLogicalSize(ghandle.renderer, v.pw, v.ph);
 }
 
 void toggleFullscreen(){
@@ -91,9 +92,7 @@ void toggleFullscreen(){
 		printf("[!] Toggling fullscreen mode failed\n");
 		return;
 	}
-	int32_t x = 0;
-	int32_t y = 0;
-	SDL_GetWindowSize(ghandle.window, &x, &y);
+	renderSetView(ghandle.renderView);
 	if ((flags & SDL_WINDOW_FULLSCREEN_DESKTOP) != 0){
 		/*
 		LINEAR WILL INTERPOLATE COLORS BETWEEN PIXELS
@@ -101,9 +100,7 @@ void toggleFullscreen(){
 		*/
 		//SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
 		//SDL_SetHint (SDL_HINT_RENDER_SCALE_QUALITY, 0);
-		//SDL_RenderSetLogicalSize(renderer, x, y);
 	}
-	SDL_SetWindowSize(ghandle.window, ghandle.windowW, ghandle.windowH);
 }
 
 v2 viewToWorldV2(v2 coords){
@@ -126,6 +123,34 @@ v2 viewToWorld(float x, float y){
 v2 worldToView(float x, float y){
 	v2 a = {x,y};
 	return worldToViewV2(a);
+}
+
+void viewToWorldV2Ptr(struct v2* coords){
+	coords->x += ghandle.renderView.x;
+	coords->y += ghandle.renderView.y;
+}
+
+void worldToViewV2Ptr(struct v2* coords){
+	coords->x -= ghandle.renderView.x;
+	coords->y -= ghandle.renderView.y;
+}
+
+void viewToWorldPtr(float* x, float* y){
+	if (x!=NULL){
+		*x += ghandle.renderView.x;
+	}
+	if (y!=NULL){
+		*y += ghandle.renderView.y;
+	}
+}
+
+void worldToViewPtr(float* x, float* y){
+	if (x!=NULL){
+		*x -= ghandle.renderView.x;
+	}
+	if (y!=NULL){
+		*y -= ghandle.renderView.y;
+	}
 }
 
 void renderFlip(){
