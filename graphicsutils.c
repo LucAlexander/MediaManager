@@ -6,7 +6,7 @@
 
 #include <stdio.h>
 
-HASHMAP_SOURCE(FontMap, const char*, font, hashS)
+HASHMAP_SOURCE(FontMap, const char*, TTF_Font*, hashS)
 
 static GraphicsHandler ghandle;
 
@@ -293,165 +293,74 @@ void drawRectB(float x1, float y1, float x2, float y2, uint8_t p){
 }
 
 void fontHandlerInit(){
-	ghandle.fonts.charList = "`1234567890-=~!@#$%^&*()_+qwertyuiop[]QWERTYUIOP{}|asdfghjkl;'ASDFGHJKL:zxcvbnm,./ZXCVBNM<>? ";
 	ghandle.fonts.activeFont = "";
-	ghandle.fonts.fnt=NULL;
+	ghandle.fonts.fnt = NULL;
 	ghandle.fonts.list = FontMapInit();
 }
 
-void loadFont(const char* src){
-	loadFontC(src, 255, 255, 255, 255);
-}
-
-void loadFontC(const char* src, uint8_t r, uint8_t g, uint8_t b, uint8_t a){
-	font* fnt = FontMapRef(&(ghandle.fonts.list), src);
-	if (fnt!=NULL){
+void loadFont(const char* src, const char* name){
+	TTF_Font* f = FontMapGet(&(ghandle.fonts.list), name).val;
+	if (f != NULL){
 		return;
 	}
-	font f;
-	memset(f.glyphMap, 0, sizeof(SDL_Texture*)*128);
-	f.r = r;
-	f.g = g;
-	f.b = b;
-	f.a = a;
-	f.kerning = 1;
-	f.leading = 1;
-	f.ptSize = 16;
-	f.scale = 1;
-	TTF_Font* lFont = TTF_OpenFont(src, f.ptSize);
-	if (lFont == NULL){
-		printf("[!] %s\n",TTF_GetError());
+	f = TTF_OpenFont(src, 16);
+	if (f == NULL){
+		TTF_CloseFont(f);
+		f = NULL;
+		return;
 	}
-	SDL_Color fg = {f.r, f.g, f.b};
-	uint32_t i;
-	char c[2];
-	c[1] = '\0';
-	for (i = 0;i<strlen(ghandle.fonts.charList);++i){
-		c[0] = ghandle.fonts.charList[i];
-		SDL_Surface* s = TTF_RenderText_Solid(lFont, c, fg);
-		SDL_Texture* t = SDL_CreateTextureFromSurface(ghandle.renderer, s);
-		if (t!=NULL){
-			SDL_SetTextureAlphaMod(t, f.a);
-			f.glyphMap[(uint8_t)c[0]] = t;
-		}
-		SDL_FreeSurface(s);
-	}
-	TTF_CloseFont(lFont);
-	FontMapPush(&(ghandle.fonts.list), src, f);
+	FontMapPush(&(ghandle.fonts.list), name, f);
 }
 
-void setFont(char* fnt){
-	font* temp = FontMapRef(&(ghandle.fonts.list), fnt);
+void setFont(char* name){
+	TTF_Font* temp = FontMapGet(&(ghandle.fonts.list), name).val;
 	if (temp == NULL){
-		printf("[!] No font %s is loaded, and cannot be set to active font\n",fnt);
+		printf("[!] No font %s is loaded, and cannot be set to active font\n",name);
 		return;
 	}
-	ghandle.fonts.activeFont = fnt;
+	ghandle.fonts.activeFont = name;
 	ghandle.fonts.fnt = temp;
-}
-
-void fontClose(font* f){
-	uint32_t i;
-	for (i = 0;i<128;++i){
-		SDL_Texture* t = f->glyphMap[i];
-		if (t != NULL){
-			SDL_DestroyTexture(t);
-		}
-	}
 }
 
 void fontHandlerClose(){
 	FontMapIterator it = FontMapIteratorInit(&(ghandle.fonts.list));
 	while(FontMapIteratorHasNext(&it)){
-		fontClose(FontMapRef(&(ghandle.fonts.list), FontMapIteratorNext(&it).key));
+		TTF_CloseFont(FontMapGet(&(ghandle.fonts.list), FontMapIteratorNext(&it).key).val);
 	}
 	FontMapFree(&(ghandle.fonts.list));
 }
 
-void resetFontGlyphBlend(font* f){
-	uint8_t i;
-	for (i = 0;i<128;++i){
-		SDL_Texture* t = f->glyphMap[i];
-	        if (t != NULL){
-			SDL_SetTextureAlphaMod(t,f->a);
-			SDL_SetTextureColorMod(t,f->r, f->g, f->b);
-		}
-	}
-}
-
-void drawTextV2(v2 pos, char* text){
+void drawTextV2(v2 pos, const char* text){
 	drawText(pos.x, pos.y, text);
 }
 
-void drawTextV2C(v2 pos, char* text, uint8_t r, uint8_t g, uint8_t b, uint8_t a){
+void drawTextV2C(v2 pos, const char* text, uint8_t r, uint8_t g, uint8_t b, uint8_t a){
 	drawTextC(pos.x, pos.y, text, r, g, b, a);
 }
 
-void drawText(float x, float y, char* text){
+void drawText(float x, float y, const char* text){
+	Uint8 r, g, b, a;
+	SDL_GetRenderDrawColor(ghandle.renderer, &r, &g, &b, &a);
+	drawTextC(x, y, text, r, g, b, a);
+}
+
+void drawTextC(float x, float y, const char* text, uint8_t r, uint8_t g, uint8_t b, uint8_t a){
 	if (text==NULL){
 		return;
 	}
-	float cSize = ghandle.fonts.fnt->scale*ghandle.fonts.fnt->ptSize;
-	SDL_Rect dest = {x, y, cSize, cSize};
-	uint32_t i;
-	for (i = 0;i<strlen(text);++i){
-		drawCharacter(text[i], &dest, x, cSize, ghandle.fonts.fnt);
-	}
-}
-
-void drawTextC(float x, float y, char* text, uint8_t r, uint8_t g, uint8_t b, uint8_t a){
-	if (text==NULL){
-		return;
-	}
-	float cSize = ghandle.fonts.fnt->scale*ghandle.fonts.fnt->ptSize;
-	SDL_Rect dest = {x, y, cSize, cSize};
-	uint32_t i;
-	for (i = 0;i<strlen(text);++i){
-		drawCharacterC(text[i], &dest, x, cSize, ghandle.fonts.fnt, r, g, b, a);
-	}
-	resetFontGlyphBlend(ghandle.fonts.fnt);
-}
-
-SDL_Texture* handleWhitespace(char c, SDL_Rect* dest, float startX, float cSize, font* f){
-	switch(c){
-		case '\n':
-			dest->y += cSize + f->leading;
-			dest->x = startX;
-		return NULL;
-		case '\t':
-			dest->x += (cSize+f->kerning)*4;
-		return NULL;
-		case ' ':
-			dest->x += cSize+f->kerning;
-		return NULL;
-	}
-	return f->glyphMap[(uint8_t)c];
-}
-
-void drawCharacter(char c, SDL_Rect* dest, float startX, float cSize, font* f){
-	SDL_Texture* t = handleWhitespace(c, dest, startX, cSize, f);
-	if(t==NULL){
-		return;
-	}
-	blitSurface(t, NULL, *dest);
-	dest->x += cSize + f->kerning;
-}
-
-void drawCharacterC(char c, SDL_Rect* dest, float startX, float cSize, font* f, uint8_t r, uint8_t g, uint8_t b, uint8_t a){
-	SDL_Texture* t = handleWhitespace(c, dest, startX, cSize, f);
-	if(t==NULL){
-		return;
-	}
-	SDL_SetTextureColorMod(t, r, g, b);
+	SDL_Color c = {r, g, b};
+	SDL_Surface* surf = TTF_RenderText_Solid(ghandle.fonts.fnt, text, c);
+	SDL_Texture* t = SDL_CreateTextureFromSurface(ghandle.renderer, surf);
 	SDL_SetTextureAlphaMod(t, a);
-	blitSurface(t, NULL, *dest);
-	dest->x += cSize + f->kerning;
+	int w, h;
+	TTF_SizeText(ghandle.fonts.fnt, text, &w, &h);
+	SDL_Rect dest = {x, y, w, h};
+	blitSurface(t, NULL, dest);
+	SDL_FreeSurface(surf);
+	SDL_DestroyTexture(t);
 }
 
 void drawTextEX(float x, float y, int32_t n, ...){
-	float cSize = ghandle.fonts.fnt->scale*ghandle.fonts.fnt->ptSize;
-	SDL_Rect dest = {x, y, cSize, cSize};
-	uint32_t i;
 	va_list args;
 	va_start(args, n);
 	const char* text;
@@ -459,58 +368,32 @@ void drawTextEX(float x, float y, int32_t n, ...){
 	uint8_t green;
 	uint8_t blue;
 	uint8_t alpha;
+	uint32_t width = 0;
 	while(n > 0){
-		red = ghandle.fonts.fnt->r;
-		green = ghandle.fonts.fnt->g;
-		blue = ghandle.fonts.fnt->b;
-		alpha = ghandle.fonts.fnt->a;
 		text = va_arg(args, const char*);
+		red = va_arg(args,int);
+		green = va_arg(args,int);
+		blue = va_arg(args,int);
+		alpha = va_arg(args,int);
 		n--;
-		if (n > 0){
-			red = va_arg(args,int);
-			green = va_arg(args,int);
-			blue = va_arg(args,int);
-			alpha = va_arg(args,int);
-			n-=4;
-		}
-		for (i = 0;i<strlen(text);++i){
-			drawCharacterC(text[i], &dest, x, cSize, ghandle.fonts.fnt, red, green, blue, alpha);
-		}
+		drawTextC(x+width, y, text, red, green, blue, alpha);
+		width += getTextWidth(text);
 	}
-	resetFontGlyphBlend(ghandle.fonts.fnt);
 	va_end(args);
 }
 
-void textWidthCharEval(char c, uint32_t* longest, uint32_t* current){
-	if (c=='\n'){
-		*longest = *current > *longest ? *current : *longest;
-		*current = 0;
-		return;
-	}
-	(*current)++;
+uint32_t getTextWidth(const char* c){
+	uint32_t w;
+	TTF_SizeText(ghandle.fonts.fnt, c, &w, NULL);
+	return w;
 }
 
-float getTextWidth(const char* c){
-	uint32_t len = strlen(c);
-	uint32_t i;
-	uint32_t longest = 0;
-	uint32_t current = 0;
-	for(i=0;i<len;++i){
-		textWidthCharEval(c[i], &longest, &current);
-	}
-	longest = current > longest ? current : longest;
-	return ghandle.fonts.fnt->scale*ghandle.fonts.fnt->ptSize*longest;
+uint32_t getTextHeight(const char* c){
+	uint32_t h;
+	TTF_SizeText(ghandle.fonts.fnt, c, &h, NULL);
+	return h;
 }
 
-float getTextHeight(const char* c){
-	uint32_t len = strlen(c);
-	uint32_t i;
-	uint32_t current = 1;
-	for(i =0;i<len;++i){
-		if (c[i]=='\n'){
-			printf("here\n");
-			current++;
-		}
-	}
-	return ghandle.fonts.fnt->scale*ghandle.fonts.fnt->ptSize*current;
+void queryTextSize(const char* text, uint32_t* w, uint32_t* h){
+	TTF_SizeText(ghandle.fonts.fnt, text, w, h);
 }

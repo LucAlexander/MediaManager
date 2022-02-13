@@ -25,24 +25,11 @@ typedef struct view{
 	float ph;
 }view;
 
-typedef struct font{
-	uint8_t r;
-	uint8_t g;
-	uint8_t b;
-	uint8_t a;
-	uint16_t kerning;
-	uint16_t leading;
-	float ptSize;
-	float scale;
-	SDL_Texture* glyphMap[128];
-}font;
-
-HASHMAP(FontMap, const char*, font)
+HASHMAP(FontMap, const char*, TTF_Font*)
 
 typedef struct fontHandler{
-	char* charList;
 	char* activeFont;
-	font* fnt;
+	TTF_Font* fnt;
 	FontMap list;
 }fontHandler;
 
@@ -140,25 +127,19 @@ void drawRectV2B(struct v2, struct v2, uint8_t p);
 void drawRectV4B(struct v4, uint8_t p);
 void drawRectB(float x1, float y1, float x2, float y2, uint8_t p);
 
-void drawTextV2(struct v2 pos, char* text);
-void drawTextV2C(struct v2 pos, char* text, uint8_t r, uint8_t g, uint8_t b, uint8_t a);
-void drawText(float x, float y, char* text);
-void drawTextC(float x, float y, char* text, uint8_t r, uint8_t g, uint8_t b, uint8_t a);
+void drawTextV2(struct v2 pos, const char* text);
+void drawTextV2C(struct v2 pos, const char* text, uint8_t r, uint8_t g, uint8_t b, uint8_t a);
+void drawText(float x, float y, const char* text);
+void drawTextC(float x, float y, const char* text, uint8_t r, uint8_t g, uint8_t b, uint8_t a);
 void drawTextEX(float x, float y, int32_t n, ...);
-void drawCharacter(char c, SDL_Rect* dest, float startX, float cSize, font* f);
-void drawCharacterC(char c, SDL_Rect* dest, float startX, float cSize, font* f, uint8_t r, uint8_t g, uint8_t b, uint8_t a);
-void resetFontGlypthBlend(font* f);
-SDL_Texture* handleWhitespace(char c, SDL_Rect* dest, float startX, float cSize, font* f);
 
-void textWidthCharEval(char c, uint32_t* longest, uint32_t* current);
-float getTextWidth(const char* c);
-float getTextHeight(const char* c);
+uint32_t getTextWidth(const char* c);
+uint32_t getTextHeight(const char* c);
+void queryTextSize(const char* text, uint32_t* w, uint32_t* h);
 
 void fontHandlerInit();
-void loadFont(const char* src);
-void loadFontC(const char* src, uint8_t r, uint8_t g, uint8_t b, uint8_t a);
+void loadFont(const char* src, const char* name);
 void setFont(char* fnt);
-void fontClose(font* f);
 void fontHandlerClose();
 
 #endif
