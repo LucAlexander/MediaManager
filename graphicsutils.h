@@ -6,7 +6,7 @@
 #include <SDL2/SDL_ttf.h>
 #include <inttypes.h>
 
-#include "../Entity-Component-System/Type-Safe-Hash-Map/hashMap.h"
+#include "./Type-Safe-Hash-Map/hashMap.h"
 
 struct v2;
 struct v4;
