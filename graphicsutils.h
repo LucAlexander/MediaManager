@@ -6,7 +6,7 @@
 #include <SDL2/SDL_ttf.h>
 #include <inttypes.h>
 
-#include "DataContainers/src/hashMap/hashMap.h"
+#include "../DataContainers/src/hashMap/hashMap.h"
 
 struct v2;
 struct v4;
