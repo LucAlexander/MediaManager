@@ -8,6 +8,9 @@ FILES=sdltestmain.c graphicsutils.c graphicsutils.h inpututils.c inpututils.h ma
 compile:
 	$(CC) $(FILES) $(CLIBS) $(CFLAGS) $(OUT)
 
+linkedCompile:
+	$(CC) sdltestmain.c -L. -lSoftUtils $(CLIBS) $(CFLAGS) $(OUT)
+
 build:
 	mkdir object
 	$(CC) -c graphicsutils.c -o ./object/graphicsutils.o
