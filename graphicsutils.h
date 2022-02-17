@@ -6,7 +6,7 @@
 #include <SDL2/SDL_ttf.h>
 #include <inttypes.h>
 
-#include "./Type-Safe-Hash-Map/hashMap.h"
+#include "DataContainers/src/hashMap/hashMap.h"
 
 struct v2;
 struct v4;
@@ -135,7 +135,7 @@ void drawTextEX(float x, float y, int32_t n, ...);
 
 uint32_t getTextWidth(const char* c);
 uint32_t getTextHeight(const char* c);
-void queryTextSize(const char* text, uint32_t* w, uint32_t* h);
+void queryTextSize(const char* text, int32_t* w, int32_t* h);
 
 void fontHandlerInit();
 void loadFont(const char* src, const char* name);

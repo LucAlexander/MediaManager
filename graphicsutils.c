@@ -383,17 +383,17 @@ void drawTextEX(float x, float y, int32_t n, ...){
 }
 
 uint32_t getTextWidth(const char* c){
-	uint32_t w;
+	int32_t w;
 	TTF_SizeText(ghandle.fonts.fnt, c, &w, NULL);
 	return w;
 }
 
 uint32_t getTextHeight(const char* c){
-	uint32_t h;
+	int32_t h;
 	TTF_SizeText(ghandle.fonts.fnt, c, &h, NULL);
 	return h;
 }
 
-void queryTextSize(const char* text, uint32_t* w, uint32_t* h){
+void queryTextSize(const char* text, int32_t* w, int32_t* h){
 	TTF_SizeText(ghandle.fonts.fnt, text, w, h);
 }

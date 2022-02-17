@@ -2,7 +2,7 @@
 #define SDLFILEUTILS_H
 
 #include <SDL2/SDL.h>
-#include "./Type-Safe-Hash-Map/hashMap.h"
+#include "DataContainers/src/hashMap/hashMap.h"
 
 HASHMAP(TextureMap, const char*, SDL_Surface*)
 
