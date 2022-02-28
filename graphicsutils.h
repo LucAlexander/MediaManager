@@ -61,6 +61,8 @@ void handlerRenderViewInit();
 SDL_Texture* getTexture(const char* src);
 
 void renderSetView(view v);
+view renderGetView();
+void renderSetViewAbsolute();
 
 void renderSetSpriteScale(float scaleX, float scaleY);
 float scaleOnX(float val);

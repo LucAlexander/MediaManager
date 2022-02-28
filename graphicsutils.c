@@ -87,6 +87,19 @@ void renderSetView(view v){
 	SDL_RenderSetLogicalSize(ghandle.renderer, v.pw, v.ph);
 }
 
+view renderGetView(){
+	return ghandle.renderView;
+}
+
+void renderSetViewAbsolute(){
+	view absview = {
+		0, 0,
+	       	0, 0,
+	       	ghandle.windowW, ghandle.windowH
+	};
+	renderSetView(absview);
+}
+
 void renderSetScaleQuality(RENDER_SCALE_QUALITY hint){
 	ghandle.renderScale = hint;
 }

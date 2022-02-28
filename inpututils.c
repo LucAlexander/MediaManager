@@ -34,11 +34,11 @@ void mouseMoveEvent(int32_t x, int32_t y){
 }
 
 int32_t mouseX(){
-	return scaleOnX(inp.mouseX);
+	return inp.mouseX;
 }
 
 int32_t mouseY(){
-	return scaleOnY(inp.mouseY);
+	return inp.mouseY;
 }
 
 v2 mousePos(){
