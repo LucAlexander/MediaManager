@@ -25,3 +25,7 @@ destruct:
 
 debug:
 	$(CC) $(FILES) $(CLIBS) $(CDEBUGFLAGS) $(CFLAGS) $(OUT)
+
+rebuild:
+	make destruct
+	make build
