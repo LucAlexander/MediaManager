@@ -72,6 +72,10 @@ void renderSetSpriteScale(float scaleX, float scaleY){
 	SDL_RenderSetScale(ghandle.renderer, ghandle.spriteScaleX, ghandle.spriteScaleY);
 }
 
+void renderSetBlendMode(SDL_BlendMode b){
+	SDL_SetRenderDrawBlendMode(ghandle.renderer, b);
+}
+
 float scaleOnX(float val){
 	return val/ghandle.spriteScaleX;
 }

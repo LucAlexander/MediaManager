@@ -40,6 +40,7 @@ typedef enum RENDER_SCALE_QUALITY{
 }RENDER_SCALE_QUALITY;
 
 void renderSetScaleQuality(RENDER_SCALE_QUALITY hint);
+void renderSetBlendMode(SDL_BlendMode b);
 
 typedef struct GraphicsHandler{
 	SDL_Window* window;
