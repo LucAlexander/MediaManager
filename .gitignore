@@ -1,4 +1,6 @@
 *.a
-object/
+*.dll
+SDL2/
+build-win/
 sdltestmain.c
 sdlrun

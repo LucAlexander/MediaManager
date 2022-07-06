@@ -6,7 +6,8 @@
 #include <SDL2/SDL_ttf.h>
 #include <inttypes.h>
 
-#include "../DataContainers/src/hashMap/hashMap.h"
+#include "hashMap.h"
+#include "sdlfileutils.h"
 
 struct v2;
 struct v4;
@@ -39,9 +40,6 @@ typedef enum RENDER_SCALE_QUALITY{
 	RENDER_SCALE_ANISOTROPIC=2
 }RENDER_SCALE_QUALITY;
 
-void renderSetScaleQuality(RENDER_SCALE_QUALITY hint);
-void renderSetBlendMode(SDL_BlendMode b);
-
 typedef struct GraphicsHandler{
 	SDL_Window* window;
 	SDL_Renderer* renderer;
@@ -52,43 +50,47 @@ typedef struct GraphicsHandler{
 	float spriteScaleX;
 	float spriteScaleY;
 	RENDER_SCALE_QUALITY renderScale;
+	fileLoader floader;
 }GraphicsHandler;
 
-void graphicsInit(uint16_t width, uint16_t height, const char* windowTitle);
-void graphicsClose();
+void renderSetScaleQuality(GraphicsHandler* ghandle, RENDER_SCALE_QUALITY hint);
+void renderSetBlendMode(GraphicsHandler* ghandle, SDL_BlendMode b);
 
-void handlerRenderViewInit();
+void graphicsInit(GraphicsHandler* ghandle, uint16_t width, uint16_t height, const char* windowTitle);
+void graphicsClose(GraphicsHandler* ghandle);
 
-SDL_Texture* getTexture(const char* src);
+void handlerRenderViewInit(GraphicsHandler* ghandle);
 
-void renderSetView(view v);
-view renderGetView();
-void renderSetViewAbsolute();
+SDL_Texture* getTexture(GraphicsHandler* ghandle, const char* src);
 
-void renderSetSpriteScale(float scaleX, float scaleY);
-float scaleOnX(float val);
-float scaleOnY(float val);
+void renderSetView(GraphicsHandler* ghandle, view v);
+view renderGetView(GraphicsHandler* ghandle);
+void renderSetViewAbsolute(GraphicsHandler* ghandle);
 
-void toggleFullscreen();
+void renderSetSpriteScale(GraphicsHandler* ghandle, float scaleX, float scaleY);
+float scaleOnX(GraphicsHandler* ghandle, float val);
+float scaleOnY(GraphicsHandler* ghandle, float val);
 
-struct v2 viewToWorldV2(struct v2 coords);
-struct v2 worldToViewV2(struct v2 coords);
-struct v2 viewToWorld(float x, float y);
-struct v2 worldToView(float x, float y);
+void toggleFullscreen(GraphicsHandler* ghandle);
 
-void viewToWorldV2Ptr(struct v2* coords);
-void worldToViewV2Ptr(struct v2* coords);
-void viewToWorldPtr(float* x, float* y);
-void worldToViewPtr(float* x, float* y);
+struct v2 viewToWorldV2(GraphicsHandler* ghandle, struct v2 coords);
+struct v2 worldToViewV2(GraphicsHandler* ghandle, struct v2 coords);
+struct v2 viewToWorld(GraphicsHandler* ghandle, float x, float y);
+struct v2 worldToView(GraphicsHandler* ghandle, float x, float y);
 
-void renderFlip();
-void renderClear();
+void viewToWorldV2Ptr(GraphicsHandler* ghandle, struct v2* coords);
+void worldToViewV2Ptr(GraphicsHandler* ghandle, struct v2* coords);
+void viewToWorldPtr(GraphicsHandler* ghandle, float* x, float* y);
+void worldToViewPtr(GraphicsHandler* ghandle, float* x, float* y);
 
-void renderSetColor(uint8_t r, uint8_t g, uint8_t b, uint8_t a);
-void renderSetTarget(SDL_Texture* t);
+void renderFlip(GraphicsHandler* ghandle);
+void renderClear(GraphicsHandler* ghandle);
 
-void formatDestRectToView(SDL_Rect* destRect);
-void formatDestFRectToView(SDL_FRect* destRect);
+void renderSetColor(GraphicsHandler* ghandle, uint8_t r, uint8_t g, uint8_t b, uint8_t a);
+void renderSetTarget(GraphicsHandler* ghandle, SDL_Texture* t);
+
+void formatDestRectToView(GraphicsHandler* ghandle, SDL_Rect* destRect);
+void formatDestFRectToView(GraphicsHandler* ghandle, SDL_FRect* destRect);
 
 typedef enum BLITABLE_FLAGS{
 	BLITABLE_VISIBLE=1,
@@ -108,42 +110,42 @@ typedef struct Blitable{
 	SDL_FPoint center;
 }Blitable;
 
-void BlitableInitF(Blitable* blit, const char* source, uint32_t w, uint32_t h);
+void BlitableInitF(GraphicsHandler* ghandle, Blitable* blit, const char* source, uint32_t w, uint32_t h);
 void BlitableInit(Blitable* blit, SDL_Texture* t, uint32_t w, uint32_t h);
-void renderBlitable(Blitable* blit, float x, float y);
-void renderBlitableV2(Blitable* blit, struct v2 pos);
+void renderBlitable(GraphicsHandler* ghandle, Blitable* blit, float x, float y);
+void renderBlitableV2(GraphicsHandler* ghandle, Blitable* blit, struct v2 pos);
 void BlitableFree(Blitable* blit);
 
-void blitSurface(SDL_Texture* texture, SDL_Rect* srcRect, SDL_Rect destRect);
-void blitSurfaceEX(SDL_Texture* texture, SDL_Rect* srcRect, SDL_Rect destRect, double angle, SDL_Point* center, SDL_RendererFlip flip);
-void blitSurfaceF(SDL_Texture* texture, SDL_Rect* srcRect, SDL_FRect destRect);
-void blitSurfaceEXF(SDL_Texture* texture, SDL_Rect* srcRect, SDL_FRect destRect, double angle, SDL_FPoint* center, SDL_RendererFlip flip);
+void blitSurface(GraphicsHandler* ghandle, SDL_Texture* texture, SDL_Rect* srcRect, SDL_Rect destRect);
+void blitSurfaceEX(GraphicsHandler* ghandle, SDL_Texture* texture, SDL_Rect* srcRect, SDL_Rect destRect, double angle, SDL_Point* center, SDL_RendererFlip flip);
+void blitSurfaceF(GraphicsHandler* ghandle, SDL_Texture* texture, SDL_Rect* srcRect, SDL_FRect destRect);
+void blitSurfaceEXF(GraphicsHandler* ghandle, SDL_Texture* texture, SDL_Rect* srcRect, SDL_FRect destRect, double angle, SDL_FPoint* center, SDL_RendererFlip flip);
 
-void drawLineV2(struct v2, struct v2);
-void drawLine(float x, float y, float xx, float yy);
+void drawLineV2(GraphicsHandler* ghandle, struct v2, struct v2);
+void drawLine(GraphicsHandler* ghandle, float x, float y, float xx, float yy);
 
 // DIMENSION [X, Y, WIDTH, HEIGHT] DRAWING
-void drawRectV2(struct v2, struct v2, uint8_t p);
-void drawRectV4(struct v4, uint8_t p);
-void drawRect(float x1, float y1, float x2, float y2, uint8_t p);
+void drawRectV2(GraphicsHandler* ghandle, struct v2, struct v2, uint8_t p);
+void drawRectV4(GraphicsHandler* ghandle, struct v4, uint8_t p);
+void drawRect(GraphicsHandler* ghandle, float x1, float y1, float x2, float y2, uint8_t p);
 // BOUNDS [LEFT TOP RIGHT BOTTOM] DRAWING
-void drawRectV2B(struct v2, struct v2, uint8_t p);
-void drawRectV4B(struct v4, uint8_t p);
-void drawRectB(float x1, float y1, float x2, float y2, uint8_t p);
+void drawRectV2B(GraphicsHandler* ghandle, struct v2, struct v2, uint8_t p);
+void drawRectV4B(GraphicsHandler* ghandle, struct v4, uint8_t p);
+void drawRectB(GraphicsHandler* ghandle, float x1, float y1, float x2, float y2, uint8_t p);
 
-void drawTextV2(struct v2 pos, const char* text);
-void drawTextV2C(struct v2 pos, const char* text, uint8_t r, uint8_t g, uint8_t b, uint8_t a);
-void drawText(float x, float y, const char* text);
-void drawTextC(float x, float y, const char* text, uint8_t r, uint8_t g, uint8_t b, uint8_t a);
-void drawTextEX(float x, float y, int32_t n, ...);
+void drawTextV2(GraphicsHandler* ghandle, struct v2 pos, const char* text);
+void drawTextV2C(GraphicsHandler* ghandle, struct v2 pos, const char* text, uint8_t r, uint8_t g, uint8_t b, uint8_t a);
+void drawText(GraphicsHandler* ghandle, float x, float y, const char* text);
+void drawTextC(GraphicsHandler* ghandle, float x, float y, const char* text, uint8_t r, uint8_t g, uint8_t b, uint8_t a);
+void drawTextEX(GraphicsHandler* ghandle, float x, float y, int32_t n, ...);
 
-uint32_t getTextWidth(const char* c);
-uint32_t getTextHeight(const char* c);
-void queryTextSize(const char* text, int32_t* w, int32_t* h);
+uint32_t getTextWidth(GraphicsHandler* ghandle, const char* c);
+uint32_t getTextHeight(GraphicsHandler* ghandle, const char* c);
+void queryTextSize(GraphicsHandler* ghandle, const char* text, int32_t* w, int32_t* h);
 
-void fontHandlerInit();
-void loadFont(const char* src, const char* name);
-void setFont(char* fnt);
-void fontHandlerClose();
+void fontHandlerInit(GraphicsHandler* ghandle);
+void loadFont(GraphicsHandler* ghandle, const char* src, const char* name);
+void setFont(GraphicsHandler* ghandle, char* fnt);
+void fontHandlerClose(GraphicsHandler* ghandle);
 
 #endif

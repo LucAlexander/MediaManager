@@ -1,31 +1,28 @@
 CC=gcc
-CFLAGS=-lSDL2 -lSDL2main -lSDL2_ttf -lSDL2_image -lm -o
+CCWIN=x86_64-w64-mingw32-gcc
+CFLAGS=-lSDL2main -lSDL2 -lSDL2_ttf -lSDL2_image -lm -o
 CDEBUGFLAGS=-Wall -g
 OUT=sdlrun
-CLIBS=-L../DataContainers -lDataContainers
-FILES=sdltestmain.c graphicsutils.c graphicsutils.h inpututils.c inpututils.h mathutils.c mathutils.h sdlfileutils.c sdlfileutils.h
+FILES=sdltestmain.c graphicsutils.c hashMap.h hashMap.c graphicsutils.h inpututils.c inpututils.h mathutils.c mathutils.h sdlfileutils.c sdlfileutils.h
 
 compile:
-	$(CC) $(FILES) $(CLIBS) $(CFLAGS) $(OUT)
-
-linkedCompile:
-	$(CC) sdltestmain.c -L. -lSoftUtils $(CLIBS) $(CFLAGS) $(OUT)
-
-build:
-	mkdir object
-	$(CC) -c graphicsutils.c -o ./object/graphicsutils.o
-	$(CC) -c inpututils.c -o ./object/inpututils.o
-	$(CC) -c mathutils.c -o ./object/mathutils.o
-	$(CC) -c sdlfileutils.c -o ./object/sdlfileutils.o
-	ar rcs libSoftUtils.a ./object/*.o
-
-destruct:
-	rm -rf ./object
-	rm -rf libSoftUtils.a
+	clear
+	$(CC) $(FILES) $(CFLAGS) $(OUT)
 
 debug:
-	$(CC) $(FILES) $(CLIBS) $(CDEBUGFLAGS) $(CFLAGS) $(OUT)
+	clear
+	$(CC) $(FILES) $(CDEBUGFLAGS) $(CFLAGS) $(OUT)
 
-rebuild:
-	make destruct
-	make build
+debug-win:
+	clear
+	rm -rf build-win/
+	mkdir build-win/
+	$(CCWIN) $(FILES) $(CDEBUGFLAGS) -ISDL2/include/ -LSDL2/lib/ -lmingw32 $(CFLAGS) $(OUT).exe
+	mv $(OUT).exe build-win/
+	cp SDL2_image.dll build-win/
+	cp SDL2.dll build-win/
+	cp SDL2_ttf.dll build-win/
+
+clean:
+	rm -f $(OUT)
+	rm -rf build-win/

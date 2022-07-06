@@ -2,7 +2,7 @@
 #define SDLFILEUTILS_H
 
 #include <SDL2/SDL.h>
-#include "../DataContainers/src/hashMap/hashMap.h"
+#include "hashMap.h"
 
 HASHMAP(TextureMap, const char*, SDL_Surface*)
 
@@ -10,10 +10,10 @@ typedef struct fileLoader{
 	TextureMap textures;
 }fileLoader;
 
-void fileLoaderInit();
+void fileLoaderInit(fileLoader* loader);
 
-SDL_Surface* loadImage(const char* src);
+SDL_Surface* loadImage(fileLoader* loader, const char* src);
 
-void fileLoaderClose();
+void fileLoaderClose(fileLoader* loader);
 
 #endif

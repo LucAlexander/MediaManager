@@ -4,26 +4,24 @@
 
 HASHMAP_SOURCE(TextureMap, const char*, SDL_Surface*, hashS)
 
-static fileLoader loader = {0};
-
-void fileLoaderInit(){
-	loader.textures = TextureMapInit();
+void fileLoaderInit(fileLoader* loader){
+	loader->textures = TextureMapInit();
 }
 
-SDL_Surface* loadImage(const char* src){
-	SDL_Surface* item = TextureMapGet(&(loader.textures), src).val;
+SDL_Surface* loadImage(fileLoader* loader, const char* src){
+	SDL_Surface* item = TextureMapGet(&(loader->textures), src).val;
 	if (item != NULL){
 		return item;
 	}
 	item = IMG_Load(src);
-	TextureMapPush(&(loader.textures), src, item);
+	TextureMapPush(&(loader->textures), src, item);
 	return item;
 }
 
-void fileLoaderClose(){
-	TextureMapIterator it = TextureMapIteratorInit(&(loader.textures));
+void fileLoaderClose(fileLoader* loader){
+	TextureMapIterator it = TextureMapIteratorInit(&(loader->textures));
 	while(TextureMapIteratorHasNext(&it)){
 		SDL_FreeSurface(TextureMapIteratorNext(&it).val);
 	}
-	TextureMapFree(&(loader.textures));
+	TextureMapFree(&(loader->textures));
 }
